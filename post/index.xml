@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Cursed Notebook</title><link>https://icy-thought.github.io/post/</link><description>Recent content in Posts on Cursed Notebook</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 09 Sep 2022 02:30:00 +0000</lastBuildDate><atom:link href="https://icy-thought.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Cleaning Up Nix Residues</title><link>https://icy-thought.github.io/p/nix-cleanup/</link><pubDate>Fri, 09 Sep 2022 02:30:00 +0000</pubDate><guid>https://icy-thought.github.io/p/nix-cleanup/</guid><description>&lt;h1 id="introduction">Introduction&lt;/h1>
+&lt;p>Managing your NixOS system is not always a simple task. It sometimes requires
+you to look in directions that you have not previously thought of.&lt;/p>
+&lt;p>One of such examples is my recent encounter with the residues left floating
+around in both:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>/nix/var/nix/profiles/per-user/&lt;/code>&lt;/li>
+&lt;li>&lt;code>/nix/var/nix/gcroots/per-user/&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>Where both of these directories had retained my pre-flake setup (1 year old) and
+never complained about the garbage even though I had on many occasions used:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>sudo nix-collect-garbage -d&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo nix store gc&lt;/code>&lt;/li>
+&lt;li>&lt;code>nix store optimise&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>After venturing inside my &lt;code>/nix/store&lt;/code> directory, I had found package builds
+tracing back to &lt;code>2021-08-26&lt;/code>, the date I used to run a non-flake based NixOS
+configuration. That had me surprised and after continues questionings and
+command pasting, I had came across the following command (output by Nix):
+&lt;code>nix store query --roots /nix/store/dapkosdkaspokdqw-old-package&lt;/code>; a command
+intended to help you unravel what could be using a certain package.&lt;/p>
+&lt;p>Apparently, &lt;code>nix-store&lt;/code> garbage collect had failed to recognize the status of my
+old user and therefore thought it was still being used, although there had been
+no mentions of it in my flake setup!&lt;/p>
+&lt;p>To counter this issue, manual intervention was required:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>sudo rm /nix/var/nix/profiles/per-user/old-user/ -rf&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo rm /nix/var/nix/gcroots/per-user/old-user/ -rf&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>And afterwards I had ran:&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>sudo nix-collect-garbage -d&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo nix store gc&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;p>To later find out that &lt;code>21962.08 MiB&lt;/code> had been freed from my system!&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>1 store paths deleted, 150.24 MiB freed&lt;/code> (&lt;code>nix-collect-garbage&lt;/code>)&lt;/li>
+&lt;li>&lt;code>15027 store paths deleted, 21811.84 MiB freed&lt;/code> (&lt;code>nix store gc&lt;/code>)&lt;/li>
+&lt;/ol>
+&lt;h1 id="closing-statement">Closing Statement&lt;/h1>
+&lt;p>Be on a look-out for old information that could still be haunting you today. You
+never know what the garbage collector fails to clean-up!&lt;/p></description></item><item><title>Debloat Android</title><link>https://icy-thought.github.io/p/debloat-android/</link><pubDate>Thu, 28 Jul 2022 09:24:00 +0000</pubDate><guid>https://icy-thought.github.io/p/debloat-android/</guid><description>&lt;h1 id="introduction">Introduction&lt;/h1>
+&lt;p>Ever wanted to remove the pre-installed applications that came with your phone?
+Fortunately, there is an easy way to debloat your phone by uninstalling the
+unnecessary applications installed on your phone rather than disabling them (as
+suggested by the application manager of your phone).&lt;/p>
+&lt;h1 id="method">Method&lt;/h1>
+&lt;ol>
+&lt;li>Append &lt;code>programs.adb.enable = true;&lt;/code> to your &lt;code>configuration.nix&lt;/code> for your NixOS dotfiles.
+a) Or install the package through your distro&amp;rsquo;s package manager.&lt;/li>
+&lt;li>Enable &amp;ldquo;developer settings&amp;rdquo; through your settings app and later plug-in your phone to your computer.&lt;/li>
+&lt;li>Launch terminal -&amp;gt; &lt;code>adb devices&lt;/code> (if device shown) -&amp;gt; &lt;code>adb shell&lt;/code> + (from your phone) allow access to your phone.&lt;/li>
+&lt;li>&lt;code>pm list packages&lt;/code> -&amp;gt; list current installed packages.&lt;/li>
+&lt;li>&lt;code>pm list users&lt;/code> -&amp;gt; to determine where to uninstall the packages from (normal, work or secure folder)&lt;/li>
+&lt;li>&lt;code>pm uninstall -k --user 0 package-name&lt;/code> -&amp;gt; uninstall package.
+a) If &lt;code>success&lt;/code> was returned = successfully uninstalled package.
+b) if &lt;code>unsuccessful&lt;/code> either package does not exist or you mistyped the package name.&lt;/li>
+&lt;/ol></description></item><item><title>Hello World</title><link>https://icy-thought.github.io/p/hello-world/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://icy-thought.github.io/p/hello-world/</guid><description>&lt;img src="https://icy-thought.github.io/p/hello-world/cover.jpg" alt="Featured image of post Hello World" />&lt;p>Welcome to Hugo theme Stack. This is your first post. Edit or delete it, then start writing!&lt;/p>
+&lt;p>For more information about this theme, check the documentation: &lt;a class="link" href="https://docs.stack.jimmycai.com/" target="_blank" rel="noopener"
+>https://docs.stack.jimmycai.com/&lt;/a>&lt;/p>
+&lt;p>Want a site like this? Check out &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack-starter" target="_blank" rel="noopener"
+>hugo-theme-stack-stater&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>Photo by &lt;a class="link" href="https://unsplash.com/@pawel_czerwinski" target="_blank" rel="noopener"
+>Pawel Czerwinski&lt;/a> on &lt;a class="link" href="https://unsplash.com/" target="_blank" rel="noopener"
+>Unsplash&lt;/a>&lt;/p>
+&lt;/blockquote></description></item><item><title>Gnome Menu Options</title><link>https://icy-thought.github.io/p/gnome-menu-options/</link><pubDate>Thu, 14 Oct 2021 10:23:00 +0000</pubDate><guid>https://icy-thought.github.io/p/gnome-menu-options/</guid><description>&lt;h1 id="addreplace-gnome-menu-options">Add/Replace Gnome Menu Options&lt;/h1>
+&lt;p>Want to replace the =Open in Terminal= with =Open in Alacritty= (or any other
+terminal)?&lt;/p>
+&lt;h2 id="what-you-need">What you need:&lt;/h2>
+&lt;ol>
+&lt;li>&lt;code>FileManager Actions&lt;/code> through:
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo pacman -S filemanager-actions
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="steps">Steps&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Install the &lt;code>FileManager Actions&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Launch the application and define a new action.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Select display item for both &lt;code>selection&lt;/code> and &lt;code>location&lt;/code> in context menu.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>Action Tab&lt;/code> settings:
+a. &lt;code>Context label&lt;/code>: the text of the action which will appear in the context menu.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>Command Tab&lt;/code> settings:
+a. &lt;code>Path&lt;/code>: &lt;code>/usr/bin/alacritty&lt;/code> (replace alacritty with your terminal of choice.)
+b. &lt;code>Parameters&lt;/code>: &lt;code>--working-directory=%d/%b&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Save the newly created action!&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h1 id="congratulations">Congratulations!&lt;/h1></description></item><item><title>NixOS WireGuard</title><link>https://icy-thought.github.io/p/nixos-wireguard/</link><pubDate>Wed, 16 Jun 2021 10:22:12 +0000</pubDate><guid>https://icy-thought.github.io/p/nixos-wireguard/</guid><description>&lt;h1 id="wireguardnix">&lt;code>Wireguard.nix&lt;/code>&lt;/h1>
+&lt;p>One of the many free &amp;amp; open-source VPN protocol and when fused with the
+wonderful declarative Nix configuration one is able to setup their system
+without hinders!&lt;/p>
+&lt;p>In this post I will attempt to explain how to setup a declarative
+&lt;code>wireguard.nix&lt;/code> module, enjoy!&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Note&lt;/strong>
+The &lt;code>&amp;lt;&amp;lt;X&amp;gt;&amp;gt;&lt;/code> provided in the source-blocks links the remaining source blocks
+with the source-block they are input in. This is useful when writing your Nix
+configurations in org-mode and later tangling (outputs the code only) the
+result to a &lt;code>example.nix&lt;/code> file.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="systemdservice-wg-quick-wg0">Systemd.service: &lt;code>wg-quick-wg0&lt;/code>.&lt;/h2>
+&lt;p>This is not a necessary step, but to prevent the service from starting during
+boot while remaining enabled one has to specify the ~wantedBy~ option.&lt;/p>
+&lt;p>Another reason to why I am using the following setup is to add the ~path~,
+listed in the ~systemd.services~, to the scope which helps me reduce the amount
+of references required when enabling the kill-switch later on.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-nix" data-lang="nix">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span> &lt;span class="n">config&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">pkgs&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">lib&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="o">...&lt;/span> &lt;span class="p">}:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">systemd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">services&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="s2">&amp;#34;wg-quick-wg0&amp;#34;&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">requires&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;network-online.target&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">after&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;network.target&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;network-online.target&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">wantedBy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">lib&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mkForce&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">environment&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">DEVICE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;wg0&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="n">pkgs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wireguard-tools&lt;/span> &lt;span class="n">pkgs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">iptables&lt;/span> &lt;span class="n">pkgs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">iproute&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="sr">&amp;lt;networking&amp;gt;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>&lt;strong>Note&lt;/strong>
+You are not limited to using ~wg0~ as an interface name. You could instead
+use whatever name you deem fit for your &lt;code>wg-quick&lt;/code> interface!&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="networking-setup-your-wg-quick-interface">Networking: Setup your &lt;code>wg-quick&lt;/code> Interface&lt;/h2>
+&lt;p>Define your &lt;code>wg-quick&lt;/code> interface (make sure to replace &lt;code>wg0&lt;/code> with your
+interface name) and obviously fill in the missing info inside the quotes:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-nix" data-lang="nix">&lt;span class="line">&lt;span class="cl"> &lt;span class="n">networking&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">wg-quick&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">interfaces&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">wg0&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">address&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">dns&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">listenPort&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">51820&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">privateKeyFile&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;wireguard_private.key&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">peers&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">publicKey&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">allowedIPs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">endpoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">persistentKeepalive&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="sr">&amp;lt;kill-switch&amp;gt;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="kill-switch-prevent-dns-leakage">Kill-Switch: Prevent DNS Leakage!&lt;/h3>
+&lt;p>When the connection is probable to leaking your DNS, the connection will
+completely shutdown and prevent any form of network flow unless the
+systemd-service has been restarted:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-nix" data-lang="nix">&lt;span class="line">&lt;span class="cl">&lt;span class="n">postUp&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> iptables -I OUTPUT ! -o wg0 -m mark ! --mark $(wg show wg0 fwmark) -m addrtype ! --dst-type LOCAL -j REJECT &amp;amp;&amp;amp; ip6tables -I OUTPUT ! -o wg0 -m mark ! --mark $(wg show wg0 fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">preDown&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> iptables -D OUTPUT ! -o wg0 -m mark ! --mark $(wg show wg0 fwmark) -m addrtype ! --dst-type LOCAL -j REJECT &amp;amp;&amp;amp; ip6tables -D OUTPUT ! -o wg0 -m mark ! --mark $(wg show wg0 fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="congratulations">Congratulations!&lt;/h1>
+&lt;p>You now have a fully functional &lt;code>wg-quick&lt;/code> interface!&lt;/p></description></item><item><title>Setting up systemd-resolved</title><link>https://icy-thought.github.io/p/systemd-resolved/</link><pubDate>Thu, 06 May 2021 12:34:00 +0000</pubDate><guid>https://icy-thought.github.io/p/systemd-resolved/</guid><description>&lt;h1 id="procedure">Procedure&lt;/h1>
+&lt;ol>
+&lt;li>Edit &lt;code>/etc/systemd/resolved.conf&lt;/code> by adding the valuable bits (dns, fallback dns)&lt;/li>
+&lt;li>Execute the follwing commands in your terminal instance:
+a. &lt;code>systemctl restart systemd-resolved&lt;/code>
+b. &lt;code>sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf&lt;/code>&lt;/li>
+&lt;/ol></description></item><item><title>PDF-Cover</title><link>https://icy-thought.github.io/p/pdf-cover/</link><pubDate>Thu, 06 May 2021 00:00:00 +0000</pubDate><guid>https://icy-thought.github.io/p/pdf-cover/</guid><description>&lt;h1 id="procedure">Procedure&lt;/h1>
+&lt;p>First, convert &lt;code>image.jpg&lt;/code> to &lt;code>image.pdf&lt;/code> through:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">convert image.jpg image.pdf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Second, combine &lt;code>image.pdf&lt;/code> with &lt;code>input.pdf&lt;/code> to produce &lt;code>output.pdf&lt;/code> through:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pdfunite image.pdf input.pdf output.pdf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Enable 'chrome-gnome-shell' in Firefox Nightly</title><link>https://icy-thought.github.io/p/chrome-gnome-shell/</link><pubDate>Thu, 22 Apr 2021 00:00:00 +0000</pubDate><guid>https://icy-thought.github.io/p/chrome-gnome-shell/</guid><description>&lt;h1 id="introduction">Introduction&lt;/h1>
+&lt;p>The process of installing extensions for your gnome-shell is not as simple as
+installing addons from your browser store. One has to first install a package
+by the name of &lt;code>GNOME Shell-integration&lt;/code> from the browser store and also
+&lt;code>chrome-gnome-shell&lt;/code> to enable Gnome-extension to install, remove and configure
+the installed Gnome extensions.&lt;/p>
+&lt;h1 id="procedure">Procedure&lt;/h1>
+&lt;p>To enable the installation of Gnome extension on the Firefox browser installed
+from nixpkgs we are required to add &lt;code>chrome-gnome-shell&lt;/code> to our installed
+packages in &lt;code>environment.systemPackages&lt;/code> and later inform the Firefox wrapper
+to enable chrome-gnome-shell for our Firefox browser:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-nix" data-lang="nix">&lt;span class="line">&lt;span class="cl">&lt;span class="n">environment&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">systemPackages&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">chrome-gnome-shell&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">nixpkgs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">firefox&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">enableGnomeExtensions&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="no">true&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="err">`&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This solution does not work for Firefox browsers installed through the Mozilla
+overlay. Therefore the user ought to link the nix-store generated
+&lt;code>org.gnome.chrome_gnome_shell.json&lt;/code> to &lt;code>~/.mozilla/native-messaging-hosts/&lt;/code>
+everytime &lt;code>chrome-gnome-shell&lt;/code> it has been updated. Not an ideal solution if
+not automated and one of the several methods used to automate such process is
+done through appending the following lines to your &lt;code>home.nix&lt;/code> to allow
+Home-Manager to automate the process for you:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-nix" data-lang="nix">&lt;span class="line">&lt;span class="cl">&lt;span class="n">home&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="s2">&amp;#34;.mozilla/native-messaging-hosts/org.gnome.chrome_gnome_shell.json&amp;#34;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">source&lt;/span> &lt;span class="err">=&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="n">pkgs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">chrome-gnome-shell&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">/lib/mozilla/native-messaging-hosts/org.gnome.chrome_gnome_shell.json&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">}&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="congratulations">Congratulations&lt;/h1>
+&lt;p>You now have a functional solution which enables you to manage your Gnome-shell
+extensions! If you have a better solution, please do tell me by either
+submitting an issue or a PR informing me about it!&lt;/p></description></item><item><title>Network Issue 1</title><link>https://icy-thought.github.io/p/network-issue-1/</link><pubDate>Fri, 16 Apr 2021 23:11:12 +0000</pubDate><guid>https://icy-thought.github.io/p/network-issue-1/</guid><description>&lt;h1 id="cause">Cause?&lt;/h1>
+&lt;p>Weird Power-saving mode enabled by default, which causes Fn-key to not disable
+light after being disabled + random network disconnection + bluetooth not
+enabling after being disabled although &lt;code>rfkill list&lt;/code> shows no presence of &lt;code>soft kill&lt;/code>.&lt;/p>
+&lt;h1 id="temporary-solution">Temporary Solution:&lt;/h1>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">su -c &lt;span class="s1">&amp;#39;ip link set wlp3s0 down &amp;amp;&amp;amp; modprobe -r rtw88_8822be &amp;amp;&amp;amp; modprobe rtw88_8822be &amp;amp;&amp;amp; ip link set wlp3s0 up&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="permantent-solution---dante777">Permantent Solution - Dante777&lt;/h1>
+&lt;p>Append one of the following in the kernel parameters of your bootloader of choice:&lt;/p>
+&lt;h2 id="power-saving-mode">Power-saving Mode&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pcie_aspm.policy&lt;span class="o">=&lt;/span>powersave
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="performance-mode">Performance Mode&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pcie_aspm.policy&lt;span class="o">=&lt;/span>performance
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Fcitx Sogoupinyin Endless Loop</title><link>https://icy-thought.github.io/p/sogoupinyin-loop/</link><pubDate>Mon, 12 Apr 2021 00:00:00 +0000</pubDate><guid>https://icy-thought.github.io/p/sogoupinyin-loop/</guid><description>&lt;h1 id="getting-started">Getting Started&lt;/h1>
+&lt;p>Are you a Chinese speaking person? A person planning on learning Chinese
+digitally? Did you download Fcitx and set it up to the point that you started
+the download for the package fcitx-sogoupinyin but ended up in an endless loop
+where you started wondering whether there was an endless reoccurring loop of
+errors but didn&amp;rsquo;t believe your gut feelings?&lt;/p>
+&lt;p>Well, I am here to confirm what you are feeling and of course, this is not the
+ultimate solution to the problem because what you might be facing could be
+something totally different than the problem I had which was an endless loop of
+building Qtwebkit, which is a package that is needed for fcitx-sogoupinyin to
+be installed.&lt;/p>
+&lt;p>The solution to the problem is very simple and goes like this:&lt;/p>
+&lt;ol>
+&lt;li>Cancel the current running installation for fcitx-sogoupinyin by clicking on &lt;code>CTRL + C&lt;/code>.&lt;/li>
+&lt;li>Install Qtwebkit-bin package from AUR.&lt;/li>
+&lt;li>Reinstall &lt;code>fcitx-sogoupinyin&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;p>That should solve the problem for you! Hope you enjoy your time learning/using
+the package :)&lt;/p></description></item><item><title>League-Client Not Found</title><link>https://icy-thought.github.io/p/lol-client-error/</link><pubDate>Fri, 02 Apr 2021 12:31:00 +0000</pubDate><guid>https://icy-thought.github.io/p/lol-client-error/</guid><description>&lt;h1 id="leagueclientexe-could-not-be-found">&lt;code>LeagueClient.exe&lt;/code> could not be found!&lt;/h1>
+&lt;p>This tutorial is written for Arch Linux users and should be followed with
+caution!&lt;/p>
+&lt;h2 id="getting-started">Getting Started&lt;/h2>
+&lt;p>Using Arch Linux as your first distro can be painful sometimes, especially when
+you don&amp;rsquo;t know your way around the system. You can get lost, depressed and even
+want to through your PC/Laptop from the 8 floor to make sure it doesn&amp;rsquo;t
+survive. Although you can reach this certain point, you sure wouldn&amp;rsquo;t commit
+suicide after having a Windows 10 update running for 1 day making all your work
+delayed!&lt;/p>
+&lt;p>I wrote this guide to ease the painful process of fixing an error you don&amp;rsquo;t
+even know the reason behind it&amp;rsquo;s existence with the help of u/msquirrel who
+helped me find the solution to the problem I was facing during the installation
+of League of Legends using the script available on Lutris website.&lt;/p>
+&lt;p>The errors that made the installation crash are the following:&lt;/p>
+&lt;h1 id="error-running-criot-gamesleague-of-legendsprerequisitesdx9dxsetupexe-silent-child-killed-unknown-signal">&lt;code>Error running C:\Riot Games\League of Legends/Prerequisites/Dx9/dxsetup.exe /silent: child killed: unknown signal&lt;/code>&lt;/h1>
+&lt;p>This error later resulted in the error mentioned in the title of this post. And
+after checking the logs while conduction a series of reinstallation of League
+of Legends on Lutris we found out there are missing packages that was supposed
+to be installed before installing the game using Lutris.&lt;/p>
+&lt;p>Those packages are:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>gnutls lib32-gnutls&lt;/code>&lt;/li>
+&lt;li>&lt;code>lib32-alsa-lib&lt;/code>&lt;/li>
+&lt;li>&lt;code>lib32-libldap&lt;/code>&lt;/li>
+&lt;li>&lt;code>lib32-lcms2&lt;/code>&lt;/li>
+&lt;li>&lt;code>samba&lt;/code>&lt;/li>
+&lt;li>&lt;code>krb5 lib32-krb5&lt;/code>&lt;/li>
+&lt;li>&lt;code>lib32-openal&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>Copy-Paste in terminal to install the packages:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S gnutls lib32-gnutls lib32-alsa-lib lib32-libldap lib32-lcms2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">samba krb5 lib32-krb5 lib32-openal
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># After Installing The Required Packages
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- Reinstall League of Legends from Lutris.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># Enjoy Playing League!
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Baloo File 100% CPU Usage</title><link>https://icy-thought.github.io/p/baloo-cpu-issue/</link><pubDate>Fri, 02 Apr 2021 00:00:00 +0000</pubDate><guid>https://icy-thought.github.io/p/baloo-cpu-issue/</guid><description>&lt;h1 id="issue">Issue&lt;/h1>
+&lt;p>When encountering this issue the computer will start using the CPU to it&amp;rsquo;s
+maximum potential which will make the fans noisy and therefore the computer
+usage experience terrible.&lt;/p>
+&lt;h1 id="solution">Solution&lt;/h1>
+&lt;p>To fix this issue you could either run &lt;code>balooctl disable&lt;/code> and later remove the
+indexing file, created by &lt;code>baloo_file_index&lt;/code>, or you could edit
+&lt;code>~/.config/baloofilerc&lt;/code> and append the following lines to the end of the
+configuration file:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[General]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">only basic indexing=true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Most KDE users have a pre-existing &lt;code>[General]&lt;/code> section and therefore appending
+&lt;code>only basic indexing=true&lt;/code> to the end of that section is enough.&lt;/p>
+&lt;p>Happy Linuxing!&lt;/p></description></item><item><title>Merge 2 Partitions Into 1</title><link>https://icy-thought.github.io/p/unify-partitions/</link><pubDate>Tue, 16 Mar 2021 21:21:12 +0000</pubDate><guid>https://icy-thought.github.io/p/unify-partitions/</guid><description>&lt;h1 id="first-and-foremost">First and Foremost&amp;hellip;&lt;/h1>
+&lt;p>I am not responsible over whatever shit that might occur during your migration
+process. What I am doing in this guide is documenting the process of the
+migration for my two previous partitions into one unified partition for the
+sake of seeking this guide when required.&lt;/p>
+&lt;h1 id="getting-started">Getting Started&lt;/h1>
+&lt;p>/Have you ever gotten into a situation where you have to clean your /root
+partitions cache constantly because it keeps getting full? And by any chance,
+did you create a separate /home and /root partition which you now regret doing?
+If so then this guide is for you!/&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Note&lt;/strong>
+Before proceeding with anything you need to know this: &lt;em>do not remove more
+than the /home partition after backing it up in another partition and it&amp;rsquo;s
+also advised that you back up both the partitions in another partition than
+/root!&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>&lt;strong>WARNING&lt;/strong>
+Before we start off with the guide I need to clarify this that you should
+apply the commands based on your partition scheme and that this guide is
+written based on my partition scheme! So please, be cautious and follow this
+guide with the help of an experienced person if you do not understand what
+you should do!**&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="current-partition-scheme">Current Partition Scheme&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>arch@archlinux ~&lt;span class="o">]&lt;/span>$ lsblk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">loop0 7:0 &lt;span class="m">0&lt;/span> 87.9M &lt;span class="m">1&lt;/span> loop /var/lib/snapd/snap/core/5548
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sda 8:0 &lt;span class="m">0&lt;/span> 465.8G &lt;span class="m">0&lt;/span> disk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda1 8:1 &lt;span class="m">0&lt;/span> 300M &lt;span class="m">0&lt;/span> part
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda2 8:2 &lt;span class="m">0&lt;/span> 100M &lt;span class="m">0&lt;/span> part
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda3 8:3 &lt;span class="m">0&lt;/span> 128M &lt;span class="m">0&lt;/span> part
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda4 8:4 &lt;span class="m">0&lt;/span> 232.7G &lt;span class="m">0&lt;/span> part
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda5 8:5 &lt;span class="m">0&lt;/span> 550M &lt;span class="m">0&lt;/span> part /boot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda6 8:6 &lt;span class="m">0&lt;/span> 12G &lt;span class="m">0&lt;/span> part &lt;span class="o">[&lt;/span>SWAP&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda7 8:7 &lt;span class="m">0&lt;/span> 20G &lt;span class="m">0&lt;/span> part /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└─sda8 8:8 &lt;span class="m">0&lt;/span> 200G &lt;span class="m">0&lt;/span> part /home
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sr0 11:0 &lt;span class="m">1&lt;/span> 1024M &lt;span class="m">0&lt;/span> rom
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="the-surgery">The surgery&lt;/h1>
+&lt;h2 id="important">IMPORTANT&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>Make sure to remove cached files which you won&amp;rsquo;t be needing for this
+procedure to reduce the amount of time required to backup your files!&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Backup &lt;code>/home&lt;/code>: will later be used to restore all the files after home
+partition (&lt;code>/dev/sdaX&lt;/code>) has been removed and turned into anllocated space.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>sudo tar czpvf /PATH/TO/BACKUP_PARTITION/home.tar.gz -C /home .&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Backup &lt;code>/root&lt;/code>: if something wrong happens throughout the process, this
+backup would be used to ensure that the process is still replicatable.&lt;/p>
+&lt;ul>
+&lt;li>&lt;em>Reboot into a LiveUSB&lt;/em> to prevent file loss during the backup process.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="before-backup">Before Backup&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;em>If you want to backup your files in your dual-boot OS&lt;/em> (Windows): you need
+to install ntfs-3g which will allow you to mount the Windows partition
+without problems.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>pacman -S ntfs-3g&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir /x; mount /dev/sdaX /x&lt;/code> (Replace: /X/ = partition, &lt;em>x&lt;/em> = folder-name).&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mount /dev/sdaX /mnt&lt;/code> (/X/ = root-partition), do not mount &lt;code>/home&lt;/code> otherwise
+it will backup alongside the &lt;code>/root&lt;/code> backup of the partition.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>tar zcvpf /PATH/TO/BACKUP_PARTITION/root.tar.gz -C /mnt .&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;em>When the backup has finished without returning errors&lt;/em> =&amp;gt; reboot and later
+check the files in the new archived folder to confirm that the files had
+indeed finished the backup process without trouble.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Reboot to LiveUSB or just ignore this and finish the rest of this guide.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="after-backup">After Backup&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>Boot into your LiveUSB.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Confirm that you are either using GPT or MBR through &lt;code>gdisk /dev/sda&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Type &lt;code>p&lt;/code> -&amp;gt; hit enter and you should be greeted with the current partition
+scheme.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Type &lt;code>d&lt;/code> to remove partition and then &lt;code>X&lt;/code> (replace /X/ with the number for
+your &lt;code>/home&lt;/code> partition)&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Repeat step 3, but replace &lt;em>X&lt;/em> with the number for the &lt;code>root&lt;/code> partition.
+a. If the process was successful, there should be no file loss from your
+&lt;code>root&lt;/code> partition due to the creation of a merged partition rather than the
+deletion of the partition, which would transfer the files to the new
+partition instead of removing them.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;em>During the writing of this guide, &lt;strong>I had used two EXT4 partitions&lt;/strong> for both
+partitions&lt;/em>, therefore you should note that the method is different for other
+partition types. (Hexcode number: 8300)&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Type ~n&lt;code>to create a new partition and later choose the number for your partition with the block size set from the&lt;/code>start sector&lt;code>to the&lt;/code>end sector&lt;code>. a. Double check your &lt;/code>start sector&lt;code>and your&lt;/code>end sector`.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Type &lt;code>p&lt;/code> to check the partition scheme and ensure that the new partition =
+&lt;code>/home + /root&lt;/code> size and make sure to check the Hexcode number for the
+partition is the same as it previously was. (Hexcode number = 8300).&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If you are satisfied with the new partition, type &lt;code>w&lt;/code> to write the new
+partition.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Expand the filesystem using &lt;code>resize2fs&lt;/code>:
+a. &lt;code>resize2fs /dev/sdaX&lt;/code>, where &lt;em>X&lt;/em> = number of the new created partition.
+b. If it returns &lt;code>e2fck -f /dev/sdaX``, then execute that command + the &lt;/code>resize2fs` command afterwards.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Mount the newly expanded partition to &lt;code>/mnt&lt;/code>:
+a. &lt;code>mount /dev/sdaX /mnt&lt;/code>
+b. Do: &lt;code>ls /mnt&lt;/code> to check if your old &lt;code>/root&lt;/code> files are still present.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir /x; mount /dev/sdaX /x&lt;/code> and locate your saved &lt;code>/home.tar.gz&lt;/code> file
+using &lt;code>cd&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>tar -zxpvf /PATH/TO/home.tar.gz -C /mnt/home&lt;/code> to unpack your files to
+&lt;code>/home&lt;/code> directory.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Remove old &lt;code>/home&lt;/code> partition from &lt;code>fstab&lt;/code> from another window,
+&lt;code>CTRL+ALT+F3&lt;/code>, through &lt;code>nano /mnt/etc/fstab&lt;/code> + remove old lines for &lt;code>/home&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h1 id="lastly">Lastly&lt;/h1>
+&lt;ol>
+&lt;li>
+&lt;p>To ensure that the process is working as expected do &lt;code>ls -l /mnt/home/&lt;/code>.
+a. It should &lt;strong>not&lt;/strong> be &lt;code>0&lt;/code> because the old files in &lt;code>/home&lt;/code> have
+transferred to the new &lt;code>/root&lt;/code> partition!&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Return to the window where you ran the tar command through &lt;code>CTRL+ALT+F3&lt;/code>,
+when the process has finished run &lt;code>sync&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Check your files through &lt;code>ls&lt;/code> and if you are satisfied&amp;hellip;. &lt;code>reboot&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h1 id="good-job">Good Job!&lt;/h1>
+&lt;p>Now you have one unified partition rather than two :P&lt;/p></description></item></channel></rss>
